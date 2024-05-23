@@ -23,9 +23,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* ItemSphere;
 
-private:
-	
-
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ItemMesh;
 

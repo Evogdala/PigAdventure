@@ -11,7 +11,6 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-class UBoxComponent;
 
 UCLASS()
 class SOMEPLATFORMER_API ABaseCreature : public ACharacter
@@ -30,14 +29,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 10.0, ClampMax = 1000.0))
 	float MinSpeed = 400.0f;
 
+	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 10.0, ClampMax = 350.0))
+	float AdditionalSpeed = 100.0f;
+
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 10.0, ClampMax = 1000.0))
 	float SpeedBoost = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 2.0, ClampMax = 20.0))
-	float SpeedIncrease = 15.0f;
-
-	UFUNCTION()
-	virtual void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	float SpeedIncrease = 20.0f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -45,9 +44,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FollowCamera;
-
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* Box;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* PlatformerMappingContext;
@@ -60,9 +56,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
-	/** Move Input Action */
+	/** Test Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* DashAction;
+	UInputAction* TestAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	int32 Score;
@@ -70,18 +66,18 @@ private:
 	void Move(const FInputActionValue& Value);
 	void StopMoving(const FInputActionValue& Value);
 	void Turning(const FInputActionValue& Value);
-	void Dash(const FInputActionValue& Value);
-	void StopDashing(const FInputActionValue& Value);
-
-	void DashHandle(bool bIsSupposeToDash);
+	void TestPerforming(const FInputActionValue& Value);
 
 	bool bIsFacingForward = true;
 	bool bIsDashing = false;
 	bool bIsMoving = false;
 
 	float MaxSpeed;
+	FVector2D LastVector;
+	FVector LastSavePointLocation;
 
 public:
-	FORCEINLINE void SetScore(const int32 Points) { Score += Points; }
+	FORCEINLINE void SetScore(const int32& Points) { Score += Points; }
 	FORCEINLINE int32 GetScore() { return Score; }
+	FORCEINLINE void SetLastSavePointLocation(const FVector& Location) { LastSavePointLocation = Location; }
 };

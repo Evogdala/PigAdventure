@@ -7,7 +7,6 @@
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/BoxComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -17,9 +16,6 @@
 ABaseCreature::ABaseCreature()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
-	Box->SetupAttachment(GetRootComponent());
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -39,7 +35,7 @@ void ABaseCreature::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MaxSpeed = MinSpeed + 100.0f;
+	MaxSpeed = MinSpeed + AdditionalSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -51,19 +47,11 @@ void ABaseCreature::BeginPlay()
 	}
 
 	Score = 0;
-
-	Box->OnComponentBeginOverlap.AddDynamic(this, &ABaseCreature::OnBoxOverlap);
-}
-
-void ABaseCreature::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Blue, FString::Printf(TEXT("Actor name: %s"), *OtherActor->GetName()));
 }
 
 void ABaseCreature::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABaseCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,9 +68,8 @@ void ABaseCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABaseCreature::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ABaseCreature::StopMoving);
 
-		//Dashing
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ABaseCreature::Dash);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ABaseCreature::StopDashing);
+		// Test Action
+		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Started, this, &ABaseCreature::TestPerforming);
 	}
 }
 
@@ -91,7 +78,7 @@ void ABaseCreature::Move(const FInputActionValue& Value)
 	bIsMoving = true;
 
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	
 	Turning(Value);
 
 	if (Controller)
@@ -107,9 +94,11 @@ void ABaseCreature::Move(const FInputActionValue& Value)
 	{
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed));
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Green, FString::Printf(TEXT("%f"), MaxSpeed));
-		GetCharacterMovement()->MaxWalkSpeed += SpeedIncrease * UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+		// Cap max speed
+		GetCharacterMovement()->MaxWalkSpeed = FMath::Clamp(GetCharacterMovement()->MaxWalkSpeed + SpeedIncrease * UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), MinSpeed, MaxSpeed);
 	}
 	
+	LastVector = MovementVector;
 }
 
 void ABaseCreature::StopMoving(const FInputActionValue& Value)
@@ -133,35 +122,16 @@ void ABaseCreature::Turning(const FInputActionValue& Value)
 		GetMesh()->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
 		bIsFacingForward = true;
 	}
-}
 
-void ABaseCreature::Dash(const FInputActionValue& Value)
-{
-	if (!bIsMoving || bIsDashing) return;
-
-	DashHandle(true);
-}
-
-void ABaseCreature::StopDashing(const FInputActionValue& Value)
-{
-	if (GetCharacterMovement()->MaxWalkSpeed > MinSpeed)
+	// Check the vector to decrease speed when turning
+	if (LastVector != MovementVector)
 	{
-		DashHandle(false);
+		GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
 	}
 }
 
-void ABaseCreature::DashHandle(bool bIsSupposeToDash)
+void ABaseCreature::TestPerforming(const FInputActionValue& Value)
 {
-	if (bIsSupposeToDash)
-	{
-		bIsDashing = true;
-		GetCharacterMovement()->MaxWalkSpeed = FMath::Clamp(GetCharacterMovement()->MaxWalkSpeed + SpeedBoost, MinSpeed, MinSpeed + SpeedBoost);
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Green, FString::Printf(TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed));
-	}
-	else
-	{
-		GetCharacterMovement()->MaxWalkSpeed -= SpeedBoost;
-		bIsDashing = false;
-	}
+	this->SetActorLocation(LastSavePointLocation);
 }
 
