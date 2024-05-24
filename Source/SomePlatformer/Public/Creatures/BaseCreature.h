@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UPlatformerOverlay;
 
 UCLASS()
 class SOMEPLATFORMER_API ABaseCreature : public ACharacter
@@ -22,6 +23,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void SetScore(const int32& Points);
 
 protected:
 	virtual void BeginPlay() override;
@@ -63,10 +66,19 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	int32 Score;
 
+	UPROPERTY()
+	APlayerController* PlayerController;
+
+	UPROPERTY()
+	UPlatformerOverlay* PlatformerOverlay;
+
+	// Inputs
 	void Move(const FInputActionValue& Value);
 	void StopMoving(const FInputActionValue& Value);
 	void Turning(const FInputActionValue& Value);
 	void TestPerforming(const FInputActionValue& Value);
+
+	void InitializeOverlay();
 
 	bool bIsFacingForward = true;
 	bool bIsDashing = false;
@@ -77,7 +89,6 @@ private:
 	FVector LastSavePointLocation;
 
 public:
-	FORCEINLINE void SetScore(const int32& Points) { Score += Points; }
 	FORCEINLINE int32 GetScore() { return Score; }
 	FORCEINLINE void SetLastSavePointLocation(const FVector& Location) { LastSavePointLocation = Location; }
 };

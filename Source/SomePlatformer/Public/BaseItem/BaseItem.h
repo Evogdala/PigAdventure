@@ -7,6 +7,7 @@
 #include "BaseItem.generated.h"
 
 class USphereComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class SOMEPLATFORMER_API ABaseItem : public AActor
@@ -25,5 +26,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UNiagaraSystem* PickupEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	USoundBase* PickupSound;
+
+	void SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const;
+	void PlaySound(USoundBase* Sound) const;
 
 };

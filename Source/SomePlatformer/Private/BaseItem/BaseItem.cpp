@@ -5,6 +5,9 @@
 
 #include "Components/SphereComponent.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 ABaseItem::ABaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -20,12 +23,26 @@ ABaseItem::ABaseItem()
 void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
+void ABaseItem::SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const
+{
+	if (NiagaraSystem)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraSystem, GetActorLocation());
+	}
+}
+
+void ABaseItem::PlaySound(USoundBase* Sound) const
+{
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, this->GetActorLocation());
+	}
+}

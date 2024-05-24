@@ -13,6 +13,9 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "HUD/PlatformerHUD.h"
+#include "HUD/PlatformerOverlay.h"
+
 ABaseCreature::ABaseCreature()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -37,8 +40,9 @@ void ABaseCreature::BeginPlay()
 
 	MaxSpeed = MinSpeed + AdditionalSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
+	PlayerController = Cast<APlayerController>(Controller);
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -46,7 +50,9 @@ void ABaseCreature::BeginPlay()
 		}
 	}
 
+	PlayerController = Cast<APlayerController>(GetController());
 	Score = 0;
+	InitializeOverlay();
 }
 
 void ABaseCreature::Tick(float DeltaTime)
@@ -73,6 +79,15 @@ void ABaseCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	}
 }
 
+void ABaseCreature::SetScore(const int32& Points)
+{
+	if (PlatformerOverlay)
+	{
+		Score += Points;
+		PlatformerOverlay->SetScore(Score);
+	}
+}
+
 void ABaseCreature::Move(const FInputActionValue& Value)
 {
 	bIsMoving = true;
@@ -92,8 +107,6 @@ void ABaseCreature::Move(const FInputActionValue& Value)
 
 	if (GetCharacterMovement()->MaxWalkSpeed < MaxSpeed)
 	{
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed));
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Green, FString::Printf(TEXT("%f"), MaxSpeed));
 		// Cap max speed
 		GetCharacterMovement()->MaxWalkSpeed = FMath::Clamp(GetCharacterMovement()->MaxWalkSpeed + SpeedIncrease * UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), MinSpeed, MaxSpeed);
 	}
@@ -133,5 +146,21 @@ void ABaseCreature::Turning(const FInputActionValue& Value)
 void ABaseCreature::TestPerforming(const FInputActionValue& Value)
 {
 	this->SetActorLocation(LastSavePointLocation);
+}
+
+void ABaseCreature::InitializeOverlay()
+{
+	if (PlayerController)
+	{
+		APlatformerHUD* PlatformerHUD = Cast<APlatformerHUD>(PlayerController->GetHUD());
+		if (PlatformerHUD)
+		{
+			PlatformerOverlay = Cast<UPlatformerOverlay>(PlatformerHUD->GetPlatformerOverlay());
+			if (PlatformerOverlay)
+			{
+				PlatformerOverlay->SetScore(Score);
+			}
+		}
+	}
 }
 

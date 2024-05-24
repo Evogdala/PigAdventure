@@ -12,12 +12,20 @@ void ASavePoint::BeginPlay()
 	Super::BeginPlay();
 
 	ItemSphere->OnComponentBeginOverlap.AddDynamic(this, &ASavePoint::OnSphereOverlap);
+	ItemSphere->OnComponentEndOverlap.AddDynamic(this, &ASavePoint::OnSphereEndOverlap);
 }
 
 void ASavePoint::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (ABaseCreature* Creature = Cast<ABaseCreature>(OtherActor))
 	{
-		Creature->SetLastSavePointLocation(GetActorLocation());
+		SpawnNiagaraSystem(PickupEffect);
+		PlaySound(PickupSound);
+		Creature->SetLastSavePointLocation(Creature->GetActorLocation());
 	}
+}
+
+void ASavePoint::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ItemSphere->DestroyComponent();
 }
