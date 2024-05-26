@@ -12,3 +12,12 @@ void UPlatformerOverlay::SetScore(int32 Score)
 	const FText PointsText = FText::FromString(PointsString);
 	ScoreCount->SetText(PointsText);
 }
+
+void UPlatformerOverlay::SetLives(int32 Lives)
+{
+	if (!LivesCount) return;
+
+	const FString LivesString = FString::Printf(TEXT("%d"), Lives);
+	const FText LivesText = FText::FromString(LivesString);
+	LivesCount->SetText(LivesText);
+}

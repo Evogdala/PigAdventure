@@ -25,6 +25,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetScore(const int32& Points);
+	void Death();
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,9 +42,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 2.0, ClampMax = 20.0))
 	float SpeedIncrease = 20.0f;
 
+	UPROPERTY(EditAnywhere, Category = Movement, meta = (ClampMin = 1, ClampMax = 30.0))
+	int32 NumberOfLives = 5;
+
 private:
 	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* CameraBoom;
+	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FollowCamera;

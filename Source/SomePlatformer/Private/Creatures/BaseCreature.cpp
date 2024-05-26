@@ -20,13 +20,13 @@ ABaseCreature::ABaseCreature()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
-	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 600.0f;
-	CameraBoom->bUsePawnControlRotation = true;
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
+	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->TargetArmLength = 600.0f;
+	SpringArm->bUsePawnControlRotation = true;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Follow Camera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->GravityScale = 1.3f;
@@ -145,6 +145,8 @@ void ABaseCreature::Turning(const FInputActionValue& Value)
 
 void ABaseCreature::TestPerforming(const FInputActionValue& Value)
 {
+	if (LastSavePointLocation.IsZero()) return;
+
 	this->SetActorLocation(LastSavePointLocation);
 }
 
@@ -159,8 +161,22 @@ void ABaseCreature::InitializeOverlay()
 			if (PlatformerOverlay)
 			{
 				PlatformerOverlay->SetScore(Score);
+				PlatformerOverlay->SetLives(NumberOfLives);
 			}
 		}
+	}
+}
+
+void ABaseCreature::Death()
+{
+	if (NumberOfLives > 1)
+	{
+		NumberOfLives--;
+		this->SetActorLocation(LastSavePointLocation);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("Game Over")));
 	}
 }
 

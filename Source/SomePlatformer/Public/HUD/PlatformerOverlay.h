@@ -15,8 +15,12 @@ class SOMEPLATFORMER_API UPlatformerOverlay : public UUserWidget
 	
 public:
 	void SetScore(int32 Score);
+	void SetLives(int32 Lives);
 
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ScoreCount;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* LivesCount;
 };
