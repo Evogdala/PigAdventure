@@ -32,16 +32,15 @@ ABaseCreature::ABaseCreature()
 	GetCharacterMovement()->GravityScale = 1.3f;
 	GetCharacterMovement()->JumpZVelocity = 500.0f;
 	GetCharacterMovement()->AirControl = 0.1f;
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0.0f, 1.0f, 0.0f));
 }
 
 void ABaseCreature::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MaxSpeed = MinSpeed + AdditionalSpeed;
-	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
 	PlayerController = Cast<APlayerController>(Controller);
-
 	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -50,7 +49,9 @@ void ABaseCreature::BeginPlay()
 		}
 	}
 
-	PlayerController = Cast<APlayerController>(GetController());
+	LastSavePointLocation = GetActorLocation();
+	MaxSpeed = MinSpeed + AdditionalSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
 	Score = 0;
 	InitializeOverlay();
 }
@@ -172,6 +173,7 @@ void ABaseCreature::Death()
 	if (NumberOfLives > 1)
 	{
 		NumberOfLives--;
+		PlatformerOverlay->SetLives(NumberOfLives);
 		this->SetActorLocation(LastSavePointLocation);
 	}
 	else

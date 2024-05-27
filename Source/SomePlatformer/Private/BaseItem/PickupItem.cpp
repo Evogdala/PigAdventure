@@ -9,7 +9,7 @@
 
 APickupItem::APickupItem()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void APickupItem::Tick(float DeltaTime)
@@ -34,6 +34,7 @@ void APickupItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	if (ABaseCreature* Creature = Cast<ABaseCreature>(OtherActor))
 	{
 		Creature->SetScore(Points);
+		PlaySound(PickupSound);
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("Score: %d"), Creature->GetScore()));
 		Destroy();
 	}

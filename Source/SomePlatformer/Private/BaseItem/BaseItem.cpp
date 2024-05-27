@@ -15,7 +15,6 @@ ABaseItem::ABaseItem()
 	ItemSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
 	SetRootComponent(ItemSphere);
 
-
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
 	ItemMesh->SetupAttachment(GetRootComponent());
 }
