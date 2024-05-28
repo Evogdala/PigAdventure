@@ -5,21 +5,28 @@
 
 #include "Components/SphereComponent.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Creatures/BaseCreature.h"
 
 APickupItem::APickupItem()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+
+	ItemSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
+	SetRootComponent(ItemSphere);
+
+	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
+	ItemMesh->SetupAttachment(GetRootComponent());
 }
 
 void APickupItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	RunningTime += DeltaTime;
-
-	AddActorWorldRotation(FRotator(0.0f, 14.0f * DeltaTime, 0.0f));
-	AddActorWorldOffset(FVector(0.0f, 0.0f, TransformedSine()));
+	AddRotation(DeltaTime);
+	MoveVertically();
 }
 
 void APickupItem::BeginPlay()
@@ -40,7 +47,18 @@ void APickupItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-float APickupItem::TransformedSine()
+void APickupItem::SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const
 {
-	return Amplitude * FMath::Sin(RunningTime * TimeConstant); // period = 2*pi/k
+	if (NiagaraSystem)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraSystem, GetActorLocation());
+	}
+}
+
+void APickupItem::PlaySound(USoundBase* Sound) const
+{
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, this->GetActorLocation());
+	}
 }

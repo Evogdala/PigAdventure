@@ -6,6 +6,9 @@
 #include "BaseItem/BaseItem.h"
 #include "PickupItem.generated.h"
 
+class USphereComponent;
+class UNiagaraSystem;
+
 UCLASS()
 class SOMEPLATFORMER_API APickupItem : public ABaseItem
 {
@@ -18,21 +21,24 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* ItemSphere;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UNiagaraSystem* PickupEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	USoundBase* PickupSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (ClampMin = 1, ClampMax = 100))
+	int32 Points = 15;
+
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters", meta = (AllowPrivateAccess = "true"))
-	float Amplitude = 0.25f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters", meta = (AllowPrivateAccess = "true"))
-	float TimeConstant = 5.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true", ClampMin = 1, ClampMax = 100))
-	int32 Points = 15;
-
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sine Parameters", meta = (AllowPrivateAccess = "true"))
-	float RunningTime;
-
-	float TransformedSine();
+	void SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const;
+	void PlaySound(USoundBase* Sound) const;
 };

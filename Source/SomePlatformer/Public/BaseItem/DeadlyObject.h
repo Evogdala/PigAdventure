@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseItem/BaseItem.h"
 #include "DeadlyObject.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class SOMEPLATFORMER_API ADeadlyObject : public AActor
+class SOMEPLATFORMER_API ADeadlyObject : public ABaseItem
 {
 	GENERATED_BODY()
 	

@@ -7,6 +7,11 @@
 
 #include "Creatures/BaseCreature.h"
 
+ASavePoint::ASavePoint()
+{
+	PrimaryActorTick.bCanEverTick = false;
+}
+
 void ASavePoint::BeginPlay()
 {
 	Super::BeginPlay();

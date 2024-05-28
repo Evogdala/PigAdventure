@@ -6,9 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "BaseItem.generated.h"
 
-class USphereComponent;
-class UNiagaraSystem;
-
 UCLASS()
 class SOMEPLATFORMER_API ABaseItem : public AActor
 {
@@ -21,19 +18,26 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* ItemSphere;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
+	float Amplitude = 0.25f;
 
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ItemMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
+	float TimeConstant = 5.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UNiagaraSystem* PickupEffect;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sine Parameters")
+	float RunningTime;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	USoundBase* PickupSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation Parameters", meta = (ClampMin = 0.0, ClampMax = 50.0))
+	float PitchRot = 0.0f;
 
-	void SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const;
-	void PlaySound(USoundBase* Sound) const;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation Parameters", meta = (ClampMin = 0.0, ClampMax = 50.0))
+	float YawRot = 0.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation Parameters", meta = (ClampMin = 0.0, ClampMax = 50.0))
+	float RollRot = 0.0f;
+
+	float TransformedSine();
+	void MoveHorizontally();
+	void MoveVertically();
+	void AddRotation(const float DeltaTime);
 };

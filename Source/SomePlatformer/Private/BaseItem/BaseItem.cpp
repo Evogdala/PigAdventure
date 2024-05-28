@@ -3,20 +3,12 @@
 
 #include "BaseItem/BaseItem.h"
 
-#include "Components/SphereComponent.h"
-
-#include "NiagaraFunctionLibrary.h"
-#include "Kismet/GameplayStatics.h"
 
 ABaseItem::ABaseItem()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-	ItemSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
-	SetRootComponent(ItemSphere);
 
-	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
-	ItemMesh->SetupAttachment(GetRootComponent());
 }
 
 void ABaseItem::BeginPlay()
@@ -28,20 +20,26 @@ void ABaseItem::BeginPlay()
 void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	RunningTime += DeltaTime;
 }
 
-void ABaseItem::SpawnNiagaraSystem(UNiagaraSystem* NiagaraSystem) const
+float ABaseItem::TransformedSine()
 {
-	if (NiagaraSystem)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraSystem, GetActorLocation());
-	}
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
 }
 
-void ABaseItem::PlaySound(USoundBase* Sound) const
+void ABaseItem::MoveHorizontally()
 {
-	if (Sound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, Sound, this->GetActorLocation());
-	}
+	AddActorWorldOffset(FVector(TransformedSine(), 0.0f, 0.0f));
+}
+
+void ABaseItem::MoveVertically()
+{
+	AddActorWorldOffset(FVector(0.0f, 0.0f, TransformedSine()));
+}
+
+void ABaseItem::AddRotation(const float DeltaTime)
+{
+	AddActorWorldRotation(FRotator(PitchRot, YawRot, RollRot) * DeltaTime);
 }
