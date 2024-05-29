@@ -91,6 +91,7 @@ private:
 	float MaxSpeed;
 	FVector2D LastVector;
 	FVector LastSavePointLocation;
+	FVector StartPoint;
 
 public:
 	FORCEINLINE int32 GetScore() { return Score; }

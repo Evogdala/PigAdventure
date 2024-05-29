@@ -50,6 +50,7 @@ void ABaseCreature::BeginPlay()
 	}
 
 	LastSavePointLocation = GetActorLocation();
+	StartPoint = GetActorLocation();
 	MaxSpeed = MinSpeed + AdditionalSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
 	Score = 0;
@@ -179,6 +180,7 @@ void ABaseCreature::Death()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("Game Over")));
+		this->SetActorLocation(StartPoint);
 	}
 }
 
