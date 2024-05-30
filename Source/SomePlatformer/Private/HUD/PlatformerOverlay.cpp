@@ -4,6 +4,19 @@
 #include "HUD/PlatformerOverlay.h"
 #include "Components/TextBlock.h"
 
+void UPlatformerOverlay::NativeOnInitialized()
+{
+	if (GetWorld())
+	{
+		APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+		if (Controller)
+		{
+			Controller->SetInputMode(FInputModeGameOnly());
+			Controller->SetShowMouseCursor(false);
+		}
+	}
+}
+
 void UPlatformerOverlay::SetScore(int32 Score)
 {
 	if (!ScoreCount) return;

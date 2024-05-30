@@ -4,26 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PlatformerOverlay.generated.h"
+#include "Menu.generated.h"
 
-class UTextBlock;
+class UButton;
 
 UCLASS()
-class SOMEPLATFORMER_API UPlatformerOverlay : public UUserWidget
+class SOMEPLATFORMER_API UMenu : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	void SetScore(int32 Score);
-	void SetLives(int32 Lives);
+	UFUNCTION(BlueprintCallable)
+	void MenuSetup();
 
 protected:
+
 	virtual void NativeOnInitialized() override;
 
-private:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ScoreCount;
+	UButton* StartButton;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* LivesCount;
+	UButton* ExitButton;
+
+private:
+	UFUNCTION()
+	void OnStartGame();
+
+	UFUNCTION()
+	void OnEndGame();
 };
