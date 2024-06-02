@@ -15,6 +15,10 @@ private:
 	UPROPERTY(EditdefaultsOnly, Category = Maps, meta = (AllowPrivateAccess = true))
 	FName StartupLevelName = NAME_None;
 
+	UPROPERTY(EditdefaultsOnly, Category = Maps, meta = (AllowPrivateAccess = true))
+	FName MenuLevelName = NAME_None;
+
 public:
 	FORCEINLINE FName GetStartupLevelName() const { return StartupLevelName; }
+	FORCEINLINE FName GetMenuLevelName() const { return MenuLevelName; }
 };

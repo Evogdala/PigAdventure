@@ -19,6 +19,5 @@ void UPlatformerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (!PlatformerCharacter) return;
 
-
 	bIsInAir = PlatformerCharacter->GetCharacterMovement()->IsFalling();
 }

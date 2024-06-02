@@ -63,6 +63,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
+	/** Game Pause */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* PauseAction;
+
 	/** Test Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* TestAction;
@@ -80,18 +84,23 @@ private:
 	void Move(const FInputActionValue& Value);
 	void StopMoving(const FInputActionValue& Value);
 	void Turning(const FInputActionValue& Value);
+	void OnPause(const FInputActionValue& Value);
 	void TestPerforming(const FInputActionValue& Value);
 
 	void InitializeOverlay();
+	void SetScoreAndLives();
 
 	bool bIsFacingForward = true;
 	bool bIsDashing = false;
 	bool bIsMoving = false;
+	bool bIsPaused = false;
 
 	float MaxSpeed;
 	FVector2D LastVector;
 	FVector LastSavePointLocation;
 	FVector StartPoint;
+
+	int32 StartingNumberOfLives;
 
 public:
 	FORCEINLINE int32 GetScore() { return Score; }

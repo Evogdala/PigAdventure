@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "PlatformerCoreTypes.generated.h"
 #include "PlatformerHUD.generated.h"
 
 UCLASS()
@@ -16,13 +17,18 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widgets")
-	TSubclassOf<UUserWidget> PlatformerHUD;
+	TSubclassOf<UUserWidget> PlatformerHUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "Widgets")
+	TSubclassOf<UUserWidget> PauseWidgetClass;
 
 	UPROPERTY()
 	UUserWidget* PlatformerOverlay;
 
 	UPROPERTY()
 	APlayerController* Controller;
+
+	void OnGameStateChanged(EGameState State);
 
 public:
 	FORCEINLINE UUserWidget* GetPlatformerOverlay() const { return PlatformerOverlay; }

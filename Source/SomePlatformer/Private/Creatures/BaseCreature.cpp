@@ -4,6 +4,7 @@
 #include "Creatures/BaseCreature.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlatformerGameInstance.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -12,6 +13,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameModeBase.h"
 
 #include "HUD/PlatformerHUD.h"
 #include "HUD/PlatformerOverlay.h"
@@ -53,6 +55,7 @@ void ABaseCreature::BeginPlay()
 	StartPoint = GetActorLocation();
 	MaxSpeed = MinSpeed + AdditionalSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MinSpeed;
+	StartingNumberOfLives = NumberOfLives;
 	Score = 0;
 	InitializeOverlay();
 }
@@ -78,6 +81,9 @@ void ABaseCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		// Test Action
 		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Started, this, &ABaseCreature::TestPerforming);
+
+		// Pause
+		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ABaseCreature::OnPause);
 	}
 }
 
@@ -145,6 +151,22 @@ void ABaseCreature::Turning(const FInputActionValue& Value)
 	}
 }
 
+void ABaseCreature::OnPause(const FInputActionValue& Value)
+{
+	if (!GetWorld() || !GetWorld()->GetAuthGameMode()) return;
+
+	if (bIsPaused)
+	{
+		GetWorld()->GetAuthGameMode()->ClearPause();
+		bIsPaused = false;
+	}
+	else
+	{
+		GetWorld()->GetAuthGameMode()->SetPause(PlayerController);
+		bIsPaused = true;
+	}
+}
+
 void ABaseCreature::TestPerforming(const FInputActionValue& Value)
 {
 	if (LastSavePointLocation.IsZero()) return;
@@ -162,8 +184,7 @@ void ABaseCreature::InitializeOverlay()
 			PlatformerOverlay = Cast<UPlatformerOverlay>(PlatformerHUD->GetPlatformerOverlay());
 			if (PlatformerOverlay)
 			{
-				PlatformerOverlay->SetScore(Score);
-				PlatformerOverlay->SetLives(NumberOfLives);
+				SetScoreAndLives();
 			}
 		}
 	}
@@ -175,12 +196,25 @@ void ABaseCreature::Death()
 	{
 		NumberOfLives--;
 		PlatformerOverlay->SetLives(NumberOfLives);
+		Score = FMath::Clamp(Score / 2, 0, Score);
+		PlatformerOverlay->SetScore(Score);
 		this->SetActorLocation(LastSavePointLocation);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Red, FString::Printf(TEXT("Game Over")));
-		this->SetActorLocation(StartPoint);
+		Score = 0;
+		NumberOfLives = StartingNumberOfLives;
+		SetScoreAndLives();
+		const UPlatformerGameInstance* GameInstance = GetWorld()->GetGameInstance<UPlatformerGameInstance>();
+		UGameplayStatics::OpenLevel(this, GameInstance->GetStartupLevelName());
+		//this->SetActorLocation(StartPoint);
 	}
+}
+
+void ABaseCreature::SetScoreAndLives()
+{
+	PlatformerOverlay->SetScore(Score);
+	PlatformerOverlay->SetLives(NumberOfLives);
 }
 

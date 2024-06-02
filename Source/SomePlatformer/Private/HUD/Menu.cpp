@@ -25,8 +25,8 @@ void UMenu::NativeOnInitialized()
 
 void UMenu::MenuSetup()
 {
-	SetVisibility(ESlateVisibility::Visible);
-	bIsFocusable = true;
+	//SetVisibility(ESlateVisibility::Visible);
+	//bIsFocusable = true;
 
 	if (GetWorld())
 	{
