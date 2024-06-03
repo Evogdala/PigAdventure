@@ -14,6 +14,8 @@ class SOMEPLATFORMER_API APlatfromerGameMode : public AGameModeBase
 	
 public:
 	virtual void StartPlay() override;
+	virtual bool SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
+	virtual bool ClearPause() override;
 
 	FGameStateSignature GameState;
 

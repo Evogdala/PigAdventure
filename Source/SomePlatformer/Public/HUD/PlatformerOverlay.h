@@ -18,7 +18,7 @@ public:
 	void SetLives(int32 Lives);
 
 protected:
-	virtual void NativeOnInitialized() override;
+	//virtual void NativeOnInitialized() override;
 
 private:
 	UPROPERTY(meta = (BindWidget))

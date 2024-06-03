@@ -5,12 +5,19 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlatformerGameInstance.h"
+#include "GameFramework/GameModeBase.h"
 
 void UPause::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
 	GameInstance = GetWorld()->GetGameInstance<UPlatformerGameInstance>();
+
+	PauseSetup();
+}
+
+void UPause::PauseSetup()
+{
 
 	if (MenuButton)
 	{
@@ -25,6 +32,11 @@ void UPause::NativeOnInitialized()
 	if (RetryButton)
 	{
 		RetryButton->OnClicked.AddDynamic(this, &UPause::OnRetryGame);
+	}
+
+	if (ContinueButton)
+	{
+		ContinueButton->OnClicked.AddDynamic(this, &UPause::OnContinueGame);
 	}
 }
 
@@ -46,4 +58,11 @@ void UPause::OnRetryGame()
 
 void UPause::OnEndGame()
 {
+}
+
+void UPause::OnContinueGame()
+{
+	if (!GetWorld() || !GetWorld()->GetAuthGameMode()) return;
+
+	GetWorld()->GetAuthGameMode()->ClearPause();
 }

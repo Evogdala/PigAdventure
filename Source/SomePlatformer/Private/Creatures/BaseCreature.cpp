@@ -13,7 +13,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/GameModeBase.h"
+#include "PlatfromerGameMode.h"
 
 #include "HUD/PlatformerHUD.h"
 #include "HUD/PlatformerOverlay.h"
@@ -49,6 +49,12 @@ void ABaseCreature::BeginPlay()
 		{
 			Subsystem->AddMappingContext(PlatformerMappingContext, 0);
 		}
+	}
+
+	GameMode = Cast<APlatfromerGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		GameMode->GameState.AddUObject(this, &ABaseCreature::OnGameStateChanged);
 	}
 
 	LastSavePointLocation = GetActorLocation();
@@ -153,17 +159,16 @@ void ABaseCreature::Turning(const FInputActionValue& Value)
 
 void ABaseCreature::OnPause(const FInputActionValue& Value)
 {
-	if (!GetWorld() || !GetWorld()->GetAuthGameMode()) return;
+	if (!GetWorld() || !GameMode) return;
 
-	if (bIsPaused)
+	if (GameMode->IsPaused())
 	{
-		GetWorld()->GetAuthGameMode()->ClearPause();
-		bIsPaused = false;
+		// ??
+		GameMode->ClearPause();
 	}
 	else
 	{
-		GetWorld()->GetAuthGameMode()->SetPause(PlayerController);
-		bIsPaused = true;
+		GameMode->SetPause(PlayerController);
 	}
 }
 
@@ -216,5 +221,20 @@ void ABaseCreature::SetScoreAndLives()
 {
 	PlatformerOverlay->SetScore(Score);
 	PlatformerOverlay->SetLives(NumberOfLives);
+}
+
+void ABaseCreature::OnGameStateChanged(EGameState State)
+{
+	if (State == EGameState::InProgress)
+	{
+		PlayerController->SetInputMode(FInputModeGameOnly());
+		PlayerController->bShowMouseCursor = false;
+	}
+
+	else
+	{
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController->bShowMouseCursor = true;
+	}
 }
 

@@ -18,6 +18,8 @@ protected:
 
 	virtual void NativeOnInitialized() override;
 
+	void PauseSetup();
+
 	UPROPERTY(meta = (BindWidget))
 	UButton* MenuButton;
 
@@ -26,6 +28,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ExitButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ContinueButton;
 
 private:
 	UFUNCTION()
@@ -36,6 +41,9 @@ private:
 
 	UFUNCTION()
 	void OnEndGame();
+
+	UFUNCTION()
+	void OnContinueGame();
 
 	UPROPERTY()
 	const UPlatformerGameInstance* GameInstance;

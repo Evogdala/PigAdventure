@@ -11,6 +11,19 @@ void UMenu::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	MenuSetup();
+}
+
+void UMenu::MenuSetup()
+{
+	if (GetWorld())
+	{
+		APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+		if (Controller)
+		{
+			Controller->SetInputMode(FInputModeUIOnly());
+			Controller->SetShowMouseCursor(true);
+		}
+	}
 
 	if (StartButton)
 	{
@@ -20,25 +33,6 @@ void UMenu::NativeOnInitialized()
 	if (ExitButton)
 	{
 		ExitButton->OnClicked.AddDynamic(this, &UMenu::OnEndGame);
-	}
-}
-
-void UMenu::MenuSetup()
-{
-	//SetVisibility(ESlateVisibility::Visible);
-	//bIsFocusable = true;
-
-	if (GetWorld())
-	{
-		APlayerController* Controller = GetWorld()->GetFirstPlayerController();
-		if (Controller)
-		{
-			/*FInputModeUIOnly InputModeData;
-			InputModeData.SetWidgetToFocus(TakeWidget());
-			InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);*/
-			Controller->SetInputMode(FInputModeUIOnly());
-			Controller->SetShowMouseCursor(true);
-		}
 	}
 }
 

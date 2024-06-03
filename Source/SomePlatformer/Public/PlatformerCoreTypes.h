@@ -1,4 +1,5 @@
 #pragma once
+
 #include "PlatformerCoreTypes.generated.h"
 
 UENUM(BlueprintType)

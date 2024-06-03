@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "PlatformerCoreTypes.generated.h"
+#include "PlatformerCoreTypes.h"
 #include "PlatformerHUD.generated.h"
 
 UCLASS()
@@ -26,7 +26,16 @@ private:
 	UUserWidget* PlatformerOverlay;
 
 	UPROPERTY()
+	UUserWidget* PlatformerPause;
+
+	UPROPERTY()
 	APlayerController* Controller;
+
+	UPROPERTY()
+	TMap<EGameState, UUserWidget*> GameWidgets;
+
+	UPROPERTY()
+	UUserWidget* CurrentWidget;
 
 	void OnGameStateChanged(EGameState State);
 

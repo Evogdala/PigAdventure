@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "PlatformerCoreTypes.h"
 #include "BaseCreature.generated.h"
 
 class USpringArmComponent;
@@ -12,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class UPlatformerOverlay;
+class APlatfromerGameMode;
 
 UCLASS()
 class SOMEPLATFORMER_API ABaseCreature : public ACharacter
@@ -80,6 +82,9 @@ private:
 	UPROPERTY()
 	UPlatformerOverlay* PlatformerOverlay;
 
+	UPROPERTY()
+	APlatfromerGameMode* GameMode;
+
 	// Inputs
 	void Move(const FInputActionValue& Value);
 	void StopMoving(const FInputActionValue& Value);
@@ -89,11 +94,11 @@ private:
 
 	void InitializeOverlay();
 	void SetScoreAndLives();
+	void OnGameStateChanged(EGameState State);
 
 	bool bIsFacingForward = true;
 	bool bIsDashing = false;
 	bool bIsMoving = false;
-	bool bIsPaused = false;
 
 	float MaxSpeed;
 	FVector2D LastVector;
